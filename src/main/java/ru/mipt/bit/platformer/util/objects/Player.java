@@ -4,11 +4,14 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.GridPoint2;
+import ru.mipt.bit.platformer.AI.state.immovable.Obstacle;
 import ru.mipt.bit.platformer.util.TileMovement;
 import ru.mipt.bit.platformer.util.enums.Direction;
 import ru.mipt.bit.platformer.util.graphics.TankGraphics;
 import ru.mipt.bit.platformer.util.movement.*;
+import ru.mipt.bit.platformer.util.tankCharacteristics.HealthStatus;
 
+import java.util.Date;
 import java.util.List;
 
 import static com.badlogic.gdx.math.MathUtils.isEqual;
@@ -24,6 +27,11 @@ public class Player implements BaseObject{
     public TileMovement tileMovement;
 
     public Movement nextMove;
+    private HealthStatus status;
+
+    private long lastTimeShooting = new Date().getTime();
+    private float movementSpeed = 0.5f;
+
 
     public Player(Texture tankTexture, GridPoint2 destinationCoordinates){
         texture = new TankGraphics(tankTexture);
@@ -107,6 +115,14 @@ public class Player implements BaseObject{
         texture.getBlueTank().dispose();
     }
 
+    public void setMovementSpeed(float movementSpeed) {
+        this.movementSpeed = movementSpeed;
+    }
+
+    public float getMovementSpeed() {
+        return movementSpeed;
+    }
+
     public void move(List<Tree> trees, List<Player> tanks, float movementSpeed) {
         if (!nextMove.isNull() && finishCheck()) {
             rotate();
@@ -173,5 +189,22 @@ public class Player implements BaseObject{
     public void moveRight(){
         nextMove = new Movement(new GridPoint2(Direction.RIGHT.vector), Direction.RIGHT.rotation);
     }
+
+    public void shoot(){}
+
+    public boolean canShoot() {
+        return status.canShoot();
+    }
+
+    public long getLastTimeShooting() {
+        return lastTimeShooting;
+    }
+
+    public void setLastTimeShooting(long time) {
+        lastTimeShooting = time;
+    }
+
+
+
 }
 
