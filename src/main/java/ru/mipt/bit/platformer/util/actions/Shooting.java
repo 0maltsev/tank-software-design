@@ -11,10 +11,10 @@ import java.util.Date;
 
 public class Shooting implements Command {
     private final Player tank;
-    private final Level logicLevel;
-    public Shooting(Player tank, Level logicLevel){
+    private final Level level;
+    public Shooting(Player tank, Level level){
         this.tank = tank;
-        this.logicLevel = logicLevel;
+        this.level = level;
     }
     @Override
     public void execute(){
@@ -22,8 +22,11 @@ public class Shooting implements Command {
         if (tank.canShoot()) {
 
             GridPoint2 bulletCoords = getNextCoords();
-            Bullet bullet = new Bullet(bulletCoords, tank.getRotation(), tank);
+            Bullet bullet = new Bullet(bulletCoords, tank.getRotation(), tank.getObstacleCheck(), tank);
 
+            if (bullet.noCollisions()) {
+                level.addBullet(bullet);
+            }
         }
         tank.setLastTimeShooting(new Date().getTime());
     }

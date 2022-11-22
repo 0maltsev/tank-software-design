@@ -13,6 +13,7 @@ import org.lwjgl.system.CallbackI;
 import ru.mipt.bit.platformer.util.graphics.ScreenPicture;
 import ru.mipt.bit.platformer.util.leveling.LevelCreator;
 import ru.mipt.bit.platformer.util.movement.Movement;
+import ru.mipt.bit.platformer.util.movement.ObstacleCheck;
 import ru.mipt.bit.platformer.util.objects.Level;
 import ru.mipt.bit.platformer.util.objects.Player;
 import ru.mipt.bit.platformer.util. objects.Tree;
@@ -31,6 +32,7 @@ public class GameDesktopLauncher implements ApplicationListener {
     private List<Tree> trees;
 
 
+    private final ObstacleCheck obstacleCheck;
     int screenSide1;
     int screenSide2;
     @Override
@@ -47,7 +49,7 @@ public class GameDesktopLauncher implements ApplicationListener {
 
         tanks = new ArrayList<>();
         for (int i = 0; i < levelGenerator.getTankCoordinates().size(); i++){
-            tanks.add(new Player(new Texture("images/tank_blue.png"), levelGenerator.getTankCoordinates().get(i)));
+            tanks.add(new Player(new Texture("images/tank_blue.png"), levelGenerator.getTankCoordinates().get(i), obstacleCheck));
         }
 
         trees = new ArrayList<>();

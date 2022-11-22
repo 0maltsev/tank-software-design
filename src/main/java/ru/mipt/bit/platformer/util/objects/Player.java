@@ -1,15 +1,15 @@
 package ru.mipt.bit.platformer.util.objects;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.GridPoint2;
-import ru.mipt.bit.platformer.AI.state.immovable.Obstacle;
 import ru.mipt.bit.platformer.util.TileMovement;
 import ru.mipt.bit.platformer.util.enums.Direction;
 import ru.mipt.bit.platformer.util.graphics.TankGraphics;
 import ru.mipt.bit.platformer.util.movement.*;
 import ru.mipt.bit.platformer.util.tankCharacteristics.HealthStatus;
+import ru.mipt.bit.platformer.util.tankCharacteristics.LowHealth;
+import ru.mipt.bit.platformer.util.tankCharacteristics.MiddleHealth;
 
 import java.util.Date;
 import java.util.List;
@@ -28,18 +28,22 @@ public class Player implements BaseObject{
 
     public Movement nextMove;
     private HealthStatus status;
+    private int life = 99;
 
     private long lastTimeShooting = new Date().getTime();
     private float movementSpeed = 0.5f;
+    private final ObstacleCheck obstacleCheck;
 
+    private boolean alive;
 
-    public Player(Texture tankTexture, GridPoint2 destinationCoordinates){
+    public Player(Texture tankTexture, GridPoint2 destinationCoordinates, ObstacleCheck obstacleCheck){
         texture = new TankGraphics(tankTexture);
         this.destination = destinationCoordinates;
         coordinates = new GridPoint2(destinationCoordinates);
         rotation = 0f;
         movementProgress = 1f;
         nextMove = new Movement();
+        this.obstacleCheck = obstacleCheck;
     }
 
     public boolean finishCheck() {
@@ -190,6 +194,17 @@ public class Player implements BaseObject{
         nextMove = new Movement(new GridPoint2(Direction.RIGHT.vector), Direction.RIGHT.rotation);
     }
 
+    public void takeDamage(Bullet bullet) {
+        life -= bullet.getDamage();
+        if (life == 66) {
+            status = new MiddleHealth(this);
+        } else if (life == 33) {
+            status = new LowHealth(this);
+        }
+        if (life <= 0)
+            alive = false;
+    }
+
     public void shoot(){}
 
     public boolean canShoot() {
@@ -204,7 +219,12 @@ public class Player implements BaseObject{
         lastTimeShooting = time;
     }
 
+    public ObstacleCheck getObstacleCheck() {
+        return obstacleCheck;
+    }
 
-
+    public boolean isTankMovementPossible(GridPoint2 obstacleCoordinates, GridPoint2 newPosition) {
+        return !obstacleCoordinates.equals(newPosition);
+    }
 }
 

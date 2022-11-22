@@ -21,6 +21,7 @@ public class Level implements Observable {
     public TileMovement tileMovement;
     public TiledMapTileLayer groundLayer;
 
+    private final List<Bullet> bullets;
     public Level(TiledMap load, Batch batch){
         level = load;
         levelRenderer = createSingleLayerMapRenderer(level, batch);
@@ -47,6 +48,11 @@ public class Level implements Observable {
 
     public void dispose(){
         level.dispose();
+    }
+
+    public void addBullet(Bullet bullet) {
+        bullets.add(bullet);
+        giveSignal(BulletAction.AddBullet, bullet);
     }
 
 

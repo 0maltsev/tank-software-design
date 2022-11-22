@@ -4,12 +4,14 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.GridPoint2;
 import ru.mipt.bit.platformer.util.enums.Direction;
 import ru.mipt.bit.platformer.util.movement.Movement;
+import ru.mipt.bit.platformer.util.movement.ObstacleCheck;
 
 import static com.badlogic.gdx.math.MathUtils.isEqual;
 import static ru.mipt.bit.platformer.util.GdxGameUtils.continueProgress;
 
 public class Bullet implements BaseObject {
-    private final float MOVEMENT_SPEED = 7f;
+    private final float movementSpeed = 7f;
+    public final int damage = 33;
     private final GridPoint2 coordinates;
     private GridPoint2 destinationCoordinates;
     private final float rotation;
@@ -18,14 +20,17 @@ public class Bullet implements BaseObject {
 
     private final Player tank;
 
+    private final ObstacleCheck obstacleCheck;
+
+    private boolean existent = true;
 
 
-    public Bullet(GridPoint2 coords, float rotation, Player tank) {
+    public Bullet(GridPoint2 coords, float rotation, ObstacleCheck obstacleCheck, Player tank) {
         this.coordinates = new GridPoint2(coords);
         this.destinationCoordinates = new GridPoint2(coords);
         this.rotation = rotation;
         this.direction = getDirectionFromRotation();
-
+        this.obstacleCheck = obstacleCheck;
         this.tank = tank;
     }
 
@@ -65,10 +70,6 @@ public class Bullet implements BaseObject {
         return tank;
     }
 
-    public boolean isMovementPossible(GridPoint2 obstacleCoordinates, GridPoint2 newPosition) {
-        return !obstacleCoordinates.equals(newPosition);
-    }
-
     public float getRotation() {
         return rotation;
     }
@@ -100,9 +101,36 @@ public class Bullet implements BaseObject {
         }
 
         float deltaTime = Gdx.graphics.getDeltaTime();
-        updateMovementProgress(deltaTime, MOVEMENT_SPEED);
+        updateMovementProgress(deltaTime, movementSpeed);
         if (hasFinishedMovement()) {
             coordinates.set(destinationCoordinates);
         }
     }
+
+    public int getDamage() {
+        return damage;
+    }
+    public boolean isExistent() {
+        return existent;
+    }
+    public void setNotExistent() {
+        existent = false;
+    }
+
+    public boolean noObstacles() {
+        GridPoint2 newCoordinates = tryMovement();
+        return obstacleCheck.noObstacleForBullet(newCoordinates, this) &&
+                obstacleCheck.noObstacleForBullet(coordinates, this);
+    }
+
+    public boolean isBulletMovementPossible(GridPoint2 obstacleCoordinates, GridPoint2 newPosition) {
+        return !obstacleCoordinates.equals(newPosition);
+    }
+
+    public boolean noCollisions() {
+        GridPoint2 newCoordinates = tryMovement();
+        return obstacleCheck.noObstacleForBullet(newCoordinates, this) &&
+                obstacleCheck.noObstacleForBullet(coordinates, this);
+    }
+
 }
